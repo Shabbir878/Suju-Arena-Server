@@ -8,7 +8,7 @@ import { User } from '../user/user.model';
 import { Booking } from './booking.model';
 import mongoose from 'mongoose';
 import {
-  calculateDurationAndPayableAount,
+  calculateDurationAndPayableAmount,
   format24Hour,
 } from './booking.utlis';
 import { initiatePayment } from '../Payment/Payment.utlis';
@@ -32,7 +32,7 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
     const isFacility = await Facility.findById(facility);
 
     if (!isFacility) {
-      throw new AppError(httpStatus.NOT_FOUND, 'facaility Not found');
+      throw new AppError(httpStatus.NOT_FOUND, 'facility Not found');
     }
     const st24 = format24Hour(startTime);
 
@@ -98,7 +98,7 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
     // const durationInHours = (end - start) / (1000 * 60 * 60);
     // const payableAmount = durationInHours * isFacility.pricePerHour;
 
-    const payableAmount = calculateDurationAndPayableAount(
+    const payableAmount = calculateDurationAndPayableAmount(
       startTime,
       endTime,
       pricePerHour,

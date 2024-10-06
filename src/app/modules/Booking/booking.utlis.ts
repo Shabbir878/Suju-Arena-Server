@@ -45,7 +45,7 @@ export function parseTimeTo24HourFormat(timeString: string): number {
   return hours + minutes / 60;
 }
 
-export const calculateDurationAndPayableAount = (
+export const calculateDurationAndPayableAmount = (
   startTime: string,
   endTime: string,
   pricePerHour: number,
