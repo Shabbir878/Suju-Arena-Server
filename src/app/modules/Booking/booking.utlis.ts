@@ -5,31 +5,31 @@ export function convertTimeTo12HourFormat(hour24: string): string {
   const minute = parseInt(minuteStr, 10);
   const suffix = hour >= 12 ? 'PM' : 'AM';
 
+  // Convert hour to 12-hour format
   hour = hour % 12;
-  hour = hour === 0 ? 12 : hour;
+  hour = hour === 0 ? 12 : hour; // Midnight case
 
-  return `${hour.toString().padStart(2, '0')}:${minuteStr.padStart(
-    2,
-    '0',
-  )} ${suffix}`;
+  return `${hour.toString().padStart(2, '0')}:${minuteStr.padStart(2, '0')} ${suffix}`;
 }
 
-export function format24Hour(timeString: string) {
+// Convert 12-hour format to 24-hour format (e.g., "02:30 PM" -> "14:30")
+// Returns total minutes since midnight
+export function format24Hour(timeString: string): number {
   const cleanedTimeString = timeString.replace(/\s+/g, '');
-
   const timePart = cleanedTimeString.slice(0, -2);
-  const period = cleanedTimeString.slice(-2);
+  const period = cleanedTimeString.slice(-2).toUpperCase(); // Ensure it's uppercase
 
   const [hour, minute] = timePart.split(':').map(Number);
   let formattedHour = hour;
 
   if (period === 'AM' && formattedHour === 12) {
-    formattedHour = 0;
+    formattedHour = 0; // Midnight case
   } else if (period === 'PM' && formattedHour !== 12) {
-    formattedHour += 12;
+    formattedHour += 12; // Convert PM hour to 24-hour format
   }
 
-  return `${formattedHour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  // Return total minutes since midnight
+  return formattedHour * 60 + minute;
 }
 
 export function parseTimeTo24HourFormat(timeString: string): number {

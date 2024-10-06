@@ -4,7 +4,7 @@ import axios from 'axios';
 import config from '../../config';
 
 export const initiatePayment = async (paymentData: any) => {
-  console.log(config.payment_url, config.signature_key);
+  // console.log(config.payment_url, config.signature_key);
 
   try {
     const res = await axios.post('https://sandbox.aamarpay.com/jsonpost.php', {
