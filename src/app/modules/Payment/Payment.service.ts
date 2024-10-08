@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Booking } from '../Booking/booking.model';
 import { verifyPayment } from './Payment.utlis';
 import { join } from 'path';
@@ -21,7 +23,7 @@ const paymentIntoDb = async (payload: any) => {
     message = 'Payment Failed!';
   }
 
-  console.log(result);
+  // console.log(result);
 
   const filePath = join(__dirname, '../../../views/confirmation.html');
   let template = readFileSync(filePath, 'utf-8');
