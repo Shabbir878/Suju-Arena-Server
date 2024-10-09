@@ -9,6 +9,7 @@ import { Booking } from '../Booking/booking.model';
 import {
   convertTimeTo12HourFormat,
   format24Hour,
+  timeToMinutes,
 } from '../Booking/booking.utlis';
 
 const facilityOpenTime = '06:00 AM';
@@ -20,7 +21,6 @@ const createSlotsIntoDb = async (payload: TSlots) => {
   if (!isFacility) {
     throw new AppError(httpStatus.NOT_FOUND, 'Facility Not Found');
   }
-
   const date = payload.date;
   const facility = payload.facility;
   const isSlots = await Slot.find({ date: date, facility: facility });
@@ -56,56 +56,67 @@ const createSlotsIntoDb = async (payload: TSlots) => {
 const availableSlotsIntoDb = async (payload: any) => {
   const { date, facility } = payload;
 
-  // Use current date if no date is provided
   const selectedDate = date || new Date().toISOString().split('T')[0];
+  console.log(date);
 
-  // Retrieve bookings with 'confirmed' status for the specified date and facility
+  // Retrieve bookings with 'confirmed' status for the specified date
+
   const bookings = await Booking.find({
     facility: facility,
     date: selectedDate,
     isBooked: 'confirmed',
   });
 
-  let availableSlots: { startTime: string; endTime: string }[] = [];
-  let currentStartTime = format24Hour(facilityOpenTime);
+  console.log(bookings);
 
-  // Sort bookings by start time
+  let availableSlots = [];
+  let currentStartTime = format24Hour(facilityOpenTime);
   const sortedBookings = bookings.sort(
-    (a, b) => format24Hour(a.startTime) - format24Hour(b.startTime),
+    (a, b) =>
+      timeToMinutes(format24Hour(a.startTime)) -
+      timeToMinutes(format24Hour(b.startTime)),
   );
 
-  // If no bookings exist, the whole day is available
   if (sortedBookings.length === 0) {
     availableSlots.push({
       startTime: facilityOpenTime,
       endTime: facilityCloseTime,
     });
   } else {
-    sortedBookings.forEach((booking) => {
+    console.log(facilityOpenTime);
+
+    console.log(currentStartTime);
+
+    bookings.forEach((booking) => {
       const bookingStartTime = format24Hour(booking.startTime);
       const bookingEndTime = format24Hour(booking.endTime);
 
-      // If there is a gap between the current available time and the booking start time
       if (currentStartTime < bookingStartTime) {
         availableSlots.push({
-          startTime: convertTimeTo12HourFormat(currentStartTime.toString()), // Convert to string
-          endTime: convertTimeTo12HourFormat(bookingStartTime.toString()), // Convert to string
+          startTime: convertTimeTo12HourFormat(currentStartTime),
+          endTime: convertTimeTo12HourFormat(bookingStartTime),
         });
       }
-
-      // Update the currentStartTime to the end of the current booking
-      currentStartTime = bookingEndTime;
+      // currentStartTime = bookingEndTime;
+      console.log(currentStartTime);
+      console.log(bookingEndTime);
     });
 
     const facilityEndTime = format24Hour(facilityCloseTime);
-    // Add any remaining time after the last booking until facility closing
     if (currentStartTime < facilityEndTime) {
       availableSlots.push({
-        startTime: convertTimeTo12HourFormat(currentStartTime.toString()), // Convert to string
-        endTime: convertTimeTo12HourFormat(facilityEndTime.toString()), // Convert to string
+        startTime: convertTimeTo12HourFormat(currentStartTime),
+        endTime: convertTimeTo12HourFormat(facilityEndTime),
       });
     }
   }
+
+  // const availableSlots = totalSlots.filter((slot) => {
+  //   return !bookings.some(
+  //     (booking) =>
+  //       slot.startTime < booking.endTime && slot.endTime > booking.startTime,
+  //   );
+  // });
 
   return availableSlots;
 };

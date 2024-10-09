@@ -32,7 +32,7 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
     const isFacility = await Facility.findById(facility);
 
     if (!isFacility) {
-      throw new AppError(httpStatus.NOT_FOUND, 'facility Not found');
+      throw new AppError(httpStatus.NOT_FOUND, 'Facility Not found');
     }
     const st24 = format24Hour(startTime);
 
@@ -122,7 +122,7 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Booking');
     }
 
-    const paymentdata = {
+    const paymentData = {
       transactionId,
       payableAmount,
       CustomerName: isUser.name,
@@ -130,13 +130,13 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
       CustomerPhone: isUser.phone,
     };
 
-    const paymentsession = await initiatePayment(paymentdata);
+    const paymentSession = await initiatePayment(paymentData);
 
-    // console.log(paymentsession);
+    // console.log(paymentSession);
     await session.commitTransaction();
     await session.endSession();
 
-    return paymentsession;
+    return paymentSession;
   } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
@@ -145,10 +145,10 @@ const createBookingIntoDb = async (payload: TBooking, user: JwtPayload) => {
 };
 
 const getAllBookingIntoDb = async () => {
-  const reslut = await Booking.find({ isBooked: 'confirmed' })
+  const result = await Booking.find({ isBooked: 'confirmed' })
     .populate('facility')
     .populate('user');
-  return reslut;
+  return result;
 };
 
 const getMyBookingIntoDb = async (user: JwtPayload) => {
