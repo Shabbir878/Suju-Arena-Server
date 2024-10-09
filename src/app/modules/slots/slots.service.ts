@@ -12,8 +12,8 @@ import {
   timeToMinutes,
 } from '../Booking/booking.utlis';
 
-const facilityOpenTime = '06:00 AM';
-const facilityCloseTime = '10:00 PM';
+const facilityOpenTime = '00:00 AM';
+const facilityCloseTime = '00:00 AM';
 
 const createSlotsIntoDb = async (payload: TSlots) => {
   const isFacility = await Facility.findById(payload.facility);
